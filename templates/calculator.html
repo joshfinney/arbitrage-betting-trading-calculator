@@ -1,0 +1,44 @@
+<div class="w-full h-full p-4">
+    <h1 class="text-center text-blue-500 text-2xl font-bold mb-6">Calculator</h1>
+    <div class="bg-white rounded-lg shadow-lg p-6">
+      <form method="post">
+        <div class="mb-6">
+          <label for="back_stake" class="block text-gray-700 text-sm font-bold mb-2">Back Stake (£):</label>
+          <input type="text" id="back_stake" name="back_stake" value="20" class="form-input" aria-label="Back Stake">
+        </div>
+        <div class="mb-6">
+          <label for="back_odds" class="block text-gray-700 text-sm font-bold mb-2">Back Odds:</label>
+          <input type="text" id="back_odds" name="back_odds" class="form-input" aria-label="Back Odds">
+        </div>
+        <div class="mb-6">
+          <label for="min_lay_odds" class="block text-gray-700 text-sm font-bold mb-2">Min Lay Odds:</label>
+          <div class="flex items-center">
+            <button type="button" onclick="adjustValue('min_lay_odds', -0.5)" class="btn btn-adjust" aria-label="Decrease Min Lay Odds">-</button>
+            <input type="text" id="min_lay_odds" name="min_lay_odds" class="form-input text-center" aria-label="Min Lay Odds">
+            <button type="button" onclick="adjustValue('min_lay_odds', 0.5)" class="btn btn-adjust" aria-label="Increase Min Lay Odds">+</button>
+          </div>
+        </div>
+        <div class="mb-6">
+          <label for="max_lay_odds" class="block text-gray-700 text-sm font-bold mb-2">Max Lay Odds:</label>
+          <div class="flex items-center">
+            <button type="button" onclick="adjustValue('max_lay_odds', -0.5)" class="btn btn-adjust" aria-label="Decrease Max Lay Odds">-</button>
+            <input type="text" id="max_lay_odds" name="max_lay_odds" class="form-input text-center" aria-label="Max Lay Odds">
+            <button type="button" onclick="adjustValue('max_lay_odds', 0.5)" class="btn btn-adjust" aria-label="Increase Max Lay Odds">+</button>
+          </div>
+        </div>
+        <div class="mb-6">
+          <label for="step" class="block text-gray-700 text-sm font-bold mb-2">Step:</label>
+          <div class="flex items-center">
+            <button type="button" onclick="adjustValue('step', -0.1)" class="btn btn-adjust" aria-label="Decrease Step">-</button>
+            <input type="text" id="step" name="step" value="0.5" class="form-input text-center" aria-label="Step">
+            <button type="button" onclick="adjustValue('step', 0.1)" class="btn btn-adjust" aria-label="Increase Step">+</button>
+          </div>
+        </div>
+        <div class="mb-6">
+          <label for="lay_commission" class="block text-gray-700 text-sm font-bold mb-2">Lay Commission (%):</label>
+          <input type="text" id="lay_commission" name="lay_commission" value="0" class="form-input" aria-label="Lay Commission">
+        </div>
+        <input type="submit" value="Calculate" class="btn btn-submit" aria-label="Calculate">
+      </form>
+    </div>
+  </div>  
