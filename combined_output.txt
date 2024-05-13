@@ -1,7 +1,7 @@
 == File Type: .css ==
 
 File: ./static/styles.css
-Size: 1074 bytes
+Size: 1635 bytes
 ========================================
 
 /* Variables for theme colors and transitions */
@@ -11,6 +11,36 @@ Size: 1074 bytes
   --primary-color: #4299e1;
   --tooltip-bg-color: rgba(0, 0, 0, 0.8);
   --tooltip-transition-duration: 0.3s;
+  --button-hover-color: #2b6cb0;
+}
+
+/* Container layout */
+body {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  width: 100vw;
+}
+
+.min-h-screen {
+  display: flex;
+  flex: 1;
+}
+
+/* Calculator and results styling */
+.fixed-left {
+  width: 25%;
+  height: 100%;
+  overflow-y: auto;
+  background-color: var(--background-color);
+  padding: 1rem;
+}
+
+.relative-right {
+  width: 75%;
+  padding: 1rem;
+  overflow-y: auto;
 }
 
 /* Fullscreen styling */
@@ -48,6 +78,10 @@ Size: 1074 bytes
   user-select: none;
 }
 
+.btn:hover {
+  background-color: var(--button-hover-color);
+}
+
 .btn-adjust {
   background-color: var(--background-color);
   border: 1px solid var(--border-color);
@@ -57,6 +91,10 @@ Size: 1074 bytes
   background-color: var(--primary-color);
   color: white;
   border: none;
+}
+
+.btn-submit:hover {
+  background-color: var(--button-hover-color);
 }
 
 /* Form input styling */
@@ -70,7 +108,7 @@ Size: 1074 bytes
 == File Type: .js ==
 
 File: ./static/scripts.js
-Size: 1982 bytes
+Size: 2107 bytes
 ========================================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -80,6 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Toggle fullscreen mode
     fullscreenBtn.addEventListener('click', () => {
       resultContainer.classList.toggle('fullscreen');
+      fullscreenBtn.textContent = resultContainer.classList.contains('fullscreen') ? 'Exit Fullscreen' : 'Toggle Fullscreen';
     });
   
     // Add input validation to all form inputs
@@ -131,13 +170,12 @@ document.addEventListener('DOMContentLoaded', () => {
       .catch(err => {
         console.error('Failed to copy text to clipboard:', err);
       });
-  };
-  
+  };  
 
 == File Type: .html ==
 
 File: ./templates/index.html
-Size: 625 bytes
+Size: 757 bytes
 ========================================
 
 <!DOCTYPE html>
@@ -151,24 +189,30 @@ Size: 625 bytes
   <script src="{{ url_for('static', filename='scripts.js') }}" defer></script>
 </head>
 <body class="bg-gray-100 font-sans">
-  <div class="min-h-screen flex flex-row">
-    {% include 'calculator.html' %}
-    {% include 'results.html' %}
+  <div class="min-h-screen flex">
+    <div class="w-1/4 bg-white shadow-md p-4 overflow-y-auto">
+      {% include 'calculator.html' %}
+    </div>
+    <div class="w-3/4 bg-white p-4 overflow-y-auto">
+      {% include 'results.html' %}
+    </div>
   </div>
 </body>
 </html>
 
-
 File: ./templates/results.html
-Size: 1726 bytes
+Size: 3509 bytes
 ========================================
 
-<div class="w-4/5 p-4 ml-auto result-container relative">
+<div class="w-full p-4 relative result-container">
     <h1 class="text-center text-blue-600 text-2xl font-semibold mb-6">Results</h1>
     <button id="fullscreen-btn" class="absolute top-4 right-4 p-2 bg-blue-500 text-white rounded">Toggle Fullscreen</button>
-    <div class="p-6 bg-white rounded-lg shadow-lg overflow-auto results-table">
+    
+    <!-- Profitable Bets Section -->
+    <div class="p-6 bg-white rounded-lg shadow-lg overflow-auto results-table mb-6">
+      <h2 class="text-xl font-semibold text-green-600 mb-4">Profitable Bets (Match Rating ≥ 100%)</h2>
       <table class="w-full text-xs lg:text-base text-gray-700">
-        <thead class="bg-blue-600 text-white">
+        <thead class="bg-green-600 text-white">
           <tr>
             <th class="px-4 py-2">Lay Odds</th>
             <th class="px-4 py-2">Lay Stake (£)</th>
@@ -179,12 +223,44 @@ Size: 1726 bytes
           </tr>
         </thead>
         <tbody>
-          {% for result in results %}
-          <tr class="text-center hover:bg-blue-50">
+          {% for result in results if result[5] >= 100 %}
+          <tr class="text-center hover:bg-green-50">
             <td class="px-3 py-2">{{ result[0] }}</td>
             <td class="px-3 py-2 copyable relative cursor-pointer" onclick="copyToClipboard(this)">
               {{ "%.2f"|format(result[1]) }}
-              <span class="tooltip absolute inset-0 flex items-center justify-center text-white bg-blue-600 rounded opacity-0 transition-opacity duration-300 ease-in-out">Copied!</span>
+              <span class="tooltip absolute inset-0 flex items-center justify-center text-white bg-green-600 rounded opacity-0 transition-opacity duration-300 ease-in-out">Copied!</span>
+            </td>
+            <td class="px-3 py-2">{{ "%.2f"|format(result[2]) }}</td>
+            <td class="px-3 py-2">{{ "%.2f"|format(result[3]) }}</td>
+            <td class="px-3 py-2">{{ "%.2f"|format(result[4]) }}</td>
+            <td class="px-3 py-2">{{ "%.2f"|format(result[5]) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  
+    <!-- Non-Profitable Bets Section -->
+    <div class="p-6 bg-white rounded-lg shadow-lg overflow-auto results-table">
+      <h2 class="text-xl font-semibold text-red-600 mb-4">Non-Profitable Bets (Match Rating < 100%)</h2>
+      <table class="w-full text-xs lg:text-base text-gray-700">
+        <thead class="bg-red-600 text-white">
+          <tr>
+            <th class="px-4 py-2">Lay Odds</th>
+            <th class="px-4 py-2">Lay Stake (£)</th>
+            <th class="px-4 py-2">Liability (£)</th>
+            <th class="px-4 py-2">Profit if Back Wins (£)</th>
+            <th class="px-4 py-2">Profit if Lay Wins (£)</th>
+            <th class="px-4 py-2">Match Rating (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for result in results if result[5] < 100 %}
+          <tr class="text-center hover:bg-red-50">
+            <td class="px-3 py-2">{{ result[0] }}</td>
+            <td class="px-3 py-2 copyable relative cursor-pointer" onclick="copyToClipboard(this)">
+              {{ "%.2f"|format(result[1]) }}
+              <span class="tooltip absolute inset-0 flex items-center justify-center text-white bg-red-600 rounded opacity-0 transition-opacity duration-300 ease-in-out">Copied!</span>
             </td>
             <td class="px-3 py-2">{{ "%.2f"|format(result[2]) }}</td>
             <td class="px-3 py-2">{{ "%.2f"|format(result[3]) }}</td>
@@ -198,10 +274,10 @@ Size: 1726 bytes
   </div>  
 
 File: ./templates/calculator.html
-Size: 2995 bytes
+Size: 2959 bytes
 ========================================
 
-<div class="w-1/5 p-4 fixed left-0 top-0 h-screen overflow-y-auto">
+<div class="w-full h-full p-4">
     <h1 class="text-center text-blue-500 text-2xl font-bold mb-6">Calculator</h1>
     <div class="bg-white rounded-lg shadow-lg p-6">
       <form method="post">

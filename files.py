@@ -53,6 +53,29 @@ def write_files_to_txt(file_dict, output_filename):
     except Exception as e:
         print(f"An error occurred: {e}")
 
+def write_directory_tree(root_dir, output_filename):
+    """
+    Write the directory tree structure to the output file.
+    """
+    try:
+        with open(output_filename, 'w') as output_file:
+            for dirpath, dirnames, filenames in os.walk(root_dir):
+                level = dirpath.replace(root_dir, '').count(os.sep)
+                indent = ' ' * 4 * (level)
+                output_file.write(f"{indent}{os.path.basename(dirpath)}/\n")
+                subindent = ' ' * 4 * (level + 1)
+                for filename in filenames:
+                    output_file.write(f"{subindent}{filename}\n")
+        
+        print(f"Directory tree written to {output_filename}")
+        
+        # Copy output file path to clipboard
+        pyperclip.copy(os.path.abspath(output_filename))
+        print(f"The output file path has been copied to the clipboard: {os.path.abspath(output_filename)}")
+        
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
 # Example usage:
 if __name__ == "__main__":
     # List of files to be written to the output file
@@ -67,3 +90,6 @@ if __name__ == "__main__":
     
     # Write found files to the output file
     write_files_to_txt(files_to_write, output_file)
+    
+    # Write the directory tree to the output file
+    write_directory_tree(root_directory, 'directory_tree.txt')

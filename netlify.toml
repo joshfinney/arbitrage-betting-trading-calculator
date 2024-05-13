@@ -1,0 +1,18 @@
+[build]
+  base = ""
+  publish = "static"
+  command = "echo 'This is a placeholder build command'"
+
+[context.production.environment]
+  # Environment variables for the build command
+  # Uncomment and set if needed, for example:
+  # PYTHON_ENV = "production"
+
+[context.deploy-preview]
+  # Settings for deploy previews
+  command = "echo 'This is a placeholder build command for deploy previews'"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
