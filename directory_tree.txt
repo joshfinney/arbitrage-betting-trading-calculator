@@ -1,12 +1,16 @@
 ./
     calc_helper.py
+    build.py
     files.py
+    netlify.toml
+    requirements.txt
     directory_tree.txt
     combined_output.txt
     calc.py
     app.py
-    __pycache__/
-        calc_helper.cpython-311.pyc
+    netlify/
+        functions/
+            index.py
     static/
         styles.css
         scripts.js
@@ -14,76 +18,3 @@
         index.html
         results.html
         calculator.html
-    .git/
-        config
-        HEAD
-        description
-        index
-        COMMIT_EDITMSG
-        FETCH_HEAD
-        objects/
-            04/
-                a904973c83b79c7592fdd0aba2673c4238ffb1
-            3c/
-                078f605adf06a9ea9126a8ac2b2b824dfc02bc
-            9d/
-                5d38cf7c542e4e992af4ed2d20d2b922aa5a97
-            a3/
-                fe9f20cc4782b4dfc994ddf19a9a6f45fad243
-            b5/
-                9acebc7b285ed7d8fa31683ee8c4c5c571f35a
-            b2/
-                2c096ceb85fed26c5498007a4f7262943a3361
-            fc/
-                824b7a103b4b01dd01797ec364b4b5976a7c6b
-            18/
-                10fd84be485c51a8d36f0d91708cd5bf354cae
-            pack/
-            36/
-                ca3ec3b5e3e426f7833bf7dc5196c1583d6336
-            info/
-            65/
-                5bb4dd6b61f31f1e3bc8afd5c4926320416784
-            a6/
-                7d96575287c49250235ea96b2b36794af8920a
-            e6/
-                7987732c2671fd57d72b8959f7e20a07b552c4
-            f0/
-                9bb8049244f8d0180d49f7b1be55b64015a014
-            c2/
-                f2e6eaf1cd73ba928af911df7475737f6d4a69
-            41/
-                6f2bbbc1e675a604c031b46e04e235f498228f
-            77/
-                48f080d24de29aac48223bcd257b4455edfa1d
-        info/
-            exclude
-        logs/
-            HEAD
-            refs/
-                heads/
-                    master
-                remotes/
-                    origin/
-                        master
-        hooks/
-            commit-msg.sample
-            pre-rebase.sample
-            pre-commit.sample
-            applypatch-msg.sample
-            fsmonitor-watchman.sample
-            pre-receive.sample
-            prepare-commit-msg.sample
-            post-update.sample
-            pre-merge-commit.sample
-            pre-applypatch.sample
-            pre-push.sample
-            update.sample
-            push-to-checkout.sample
-        refs/
-            heads/
-                master
-            tags/
-            remotes/
-                origin/
-                    master

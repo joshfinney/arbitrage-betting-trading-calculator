@@ -1,7 +1,7 @@
 == File Type: .css ==
 
 File: ./static/styles.css
-Size: 1635 bytes
+Size: 1693 bytes
 ========================================
 
 /* Variables for theme colors and transitions */
@@ -12,35 +12,6 @@ Size: 1635 bytes
   --tooltip-bg-color: rgba(0, 0, 0, 0.8);
   --tooltip-transition-duration: 0.3s;
   --button-hover-color: #2b6cb0;
-}
-
-/* Container layout */
-body {
-  display: flex;
-  margin: 0;
-  padding: 0;
-  height: 100vh;
-  width: 100vw;
-}
-
-.min-h-screen {
-  display: flex;
-  flex: 1;
-}
-
-/* Calculator and results styling */
-.fixed-left {
-  width: 25%;
-  height: 100%;
-  overflow-y: auto;
-  background-color: var(--background-color);
-  padding: 1rem;
-}
-
-.relative-right {
-  width: 75%;
-  padding: 1rem;
-  overflow-y: auto;
 }
 
 /* Fullscreen styling */
@@ -105,10 +76,38 @@ body {
   width: 100%;
 }
 
+/* Results container styling */
+.result-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.results-table {
+  overflow-x: auto;
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.results-table table {
+  min-width: 100%;
+  border-collapse: collapse;
+}
+
+.results-table th,
+.results-table td {
+  padding: 0.7rem;
+  text-align: center;
+  border: 0px solid var(--border-color);
+}
+
 == File Type: .js ==
 
 File: ./static/scripts.js
-Size: 2107 bytes
+Size: 2113 bytes
 ========================================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -158,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
    * @param {HTMLElement} element - The element containing the text to copy.
    */
   const copyToClipboard = (element) => {
-    const text = element.innerText.trim();
+    const text = element.getAttribute('data-value');
     navigator.clipboard.writeText(text)
       .then(() => {
         const tooltip = element.querySelector('.tooltip');
@@ -170,155 +169,96 @@ document.addEventListener('DOMContentLoaded', () => {
       .catch(err => {
         console.error('Failed to copy text to clipboard:', err);
       });
-  };  
+};
 
 == File Type: .html ==
 
-File: ./templates/index.html
-Size: 757 bytes
-========================================
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Matched Betting Dashboard</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet">
-  <script src="{{ url_for('static', filename='scripts.js') }}" defer></script>
-</head>
-<body class="bg-gray-100 font-sans">
-  <div class="min-h-screen flex">
-    <div class="w-1/4 bg-white shadow-md p-4 overflow-y-auto">
-      {% include 'calculator.html' %}
-    </div>
-    <div class="w-3/4 bg-white p-4 overflow-y-auto">
-      {% include 'results.html' %}
-    </div>
-  </div>
-</body>
-</html>
-
 File: ./templates/results.html
-Size: 3509 bytes
+Size: 4199 bytes
 ========================================
 
-<div class="w-full p-4 relative result-container">
-    <h1 class="text-center text-blue-600 text-2xl font-semibold mb-6">Results</h1>
-    <button id="fullscreen-btn" class="absolute top-4 right-4 p-2 bg-blue-500 text-white rounded">Toggle Fullscreen</button>
-    
-    <!-- Profitable Bets Section -->
-    <div class="p-6 bg-white rounded-lg shadow-lg overflow-auto results-table mb-6">
-      <h2 class="text-xl font-semibold text-green-600 mb-4">Profitable Bets (Match Rating ≥ 100%)</h2>
-      <table class="w-full text-xs lg:text-base text-gray-700">
-        <thead class="bg-green-600 text-white">
-          <tr>
-            <th class="px-4 py-2">Lay Odds</th>
-            <th class="px-4 py-2">Lay Stake (£)</th>
-            <th class="px-4 py-2">Liability (£)</th>
-            <th class="px-4 py-2">Profit if Back Wins (£)</th>
-            <th class="px-4 py-2">Profit if Lay Wins (£)</th>
-            <th class="px-4 py-2">Match Rating (%)</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for result in results if result[5] >= 100 %}
-          <tr class="text-center hover:bg-green-50">
-            <td class="px-3 py-2">{{ result[0] }}</td>
-            <td class="px-3 py-2 copyable relative cursor-pointer" onclick="copyToClipboard(this)">
-              {{ "%.2f"|format(result[1]) }}
-              <span class="tooltip absolute inset-0 flex items-center justify-center text-white bg-green-600 rounded opacity-0 transition-opacity duration-300 ease-in-out">Copied!</span>
-            </td>
-            <td class="px-3 py-2">{{ "%.2f"|format(result[2]) }}</td>
-            <td class="px-3 py-2">{{ "%.2f"|format(result[3]) }}</td>
-            <td class="px-3 py-2">{{ "%.2f"|format(result[4]) }}</td>
-            <td class="px-3 py-2">{{ "%.2f"|format(result[5]) }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  
-    <!-- Non-Profitable Bets Section -->
-    <div class="p-6 bg-white rounded-lg shadow-lg overflow-auto results-table">
-      <h2 class="text-xl font-semibold text-red-600 mb-4">Non-Profitable Bets (Match Rating < 100%)</h2>
-      <table class="w-full text-xs lg:text-base text-gray-700">
-        <thead class="bg-red-600 text-white">
-          <tr>
-            <th class="px-4 py-2">Lay Odds</th>
-            <th class="px-4 py-2">Lay Stake (£)</th>
-            <th class="px-4 py-2">Liability (£)</th>
-            <th class="px-4 py-2">Profit if Back Wins (£)</th>
-            <th class="px-4 py-2">Profit if Lay Wins (£)</th>
-            <th class="px-4 py-2">Match Rating (%)</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for result in results if result[5] < 100 %}
-          <tr class="text-center hover:bg-red-50">
-            <td class="px-3 py-2">{{ result[0] }}</td>
-            <td class="px-3 py-2 copyable relative cursor-pointer" onclick="copyToClipboard(this)">
-              {{ "%.2f"|format(result[1]) }}
-              <span class="tooltip absolute inset-0 flex items-center justify-center text-white bg-red-600 rounded opacity-0 transition-opacity duration-300 ease-in-out">Copied!</span>
-            </td>
-            <td class="px-3 py-2">{{ "%.2f"|format(result[2]) }}</td>
-            <td class="px-3 py-2">{{ "%.2f"|format(result[3]) }}</td>
-            <td class="px-3 py-2">{{ "%.2f"|format(result[4]) }}</td>
-            <td class="px-3 py-2">{{ "%.2f"|format(result[5]) }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>  
+<h1 class="text-center text-blue-600 text-2xl font-semibold mb-6">Results</h1>
+<button id="fullscreen-btn" class="absolute top-4 right-4 p-2 bg-blue-500 text-white rounded">Toggle Fullscreen</button>
 
-File: ./templates/calculator.html
-Size: 2959 bytes
-========================================
+<!-- Profitable Bets Section -->
+<div class="p-6 bg-slate-100 rounded-lg shadow-lg overflow-auto results-table mb-6">
+  <table class="w-full text-xs lg:text-base text-gray-700">
+    <thead class="bg-green-600 text-white">
+      <tr>
+        <th class="px-4 py-2">Lay Odds</th>
+        <th class="px-4 py-2">Lay Stake (£)</th>
+        <th class="px-4 py-2">Liability (£)</th>
+        <th class="px-4 py-2">Profit if Back Wins (£)</th>
+        <th class="px-4 py-2">Profit if Lay Wins (£)</th>
+        <th class="px-4 py-2">Match Rating (%)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% set profitable_results = results|selectattr('5', '>=', 100)|list %}
+      {% if profitable_results %}
+        {% for result in profitable_results %}
+        <tr class="text-center hover:bg-green-50">
+          <td class="px-3 py-2 copyable relative cursor-pointer" data-value="{{ result[0] }}" onclick="copyToClipboard(this)">
+            {{ result[0] }}
+            <span class="tooltip absolute inset-0 flex items-center justify-center text-white bg-green-600 rounded opacity-0 transition-opacity duration-300 ease-in-out">Copied!</span>
+          </td>
+          <td class="px-3 py-2 copyable relative cursor-pointer" data-value="{{ "%.2f"|format(result[1]) }}" onclick="copyToClipboard(this)">
+            {{ "%.2f"|format(result[1]) }}
+            <span class="tooltip absolute inset-0 flex items-center justify-center text-white bg-green-600 rounded opacity-0 transition-opacity duration-300 ease-in-out">Copied!</span>
+          </td>
+          <td class="px-3 py-2">{{ "%.2f"|format(result[2]) }}</td>
+          <td class="px-3 py-2">{{ "%.2f"|format(result[3]) }}</td>
+          <td class="px-3 py-2">{{ "%.2f"|format(result[4]) }}</td>
+          <td class="px-3 py-2">{{ "%.2f"|format(result[5]) }}</td>
+        </tr>
+        {% endfor %}
+      {% else %}
+        <tr>
+          <td colspan="6">Looks like an L 😢</td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
 
-<div class="w-full h-full p-4">
-    <h1 class="text-center text-blue-500 text-2xl font-bold mb-6">Calculator</h1>
-    <div class="bg-white rounded-lg shadow-lg p-6">
-      <form method="post">
-        <div class="mb-6">
-          <label for="back_stake" class="block text-gray-700 text-sm font-bold mb-2">Back Stake (£):</label>
-          <input type="text" id="back_stake" name="back_stake" value="20" class="form-input" aria-label="Back Stake">
-        </div>
-        <div class="mb-6">
-          <label for="back_odds" class="block text-gray-700 text-sm font-bold mb-2">Back Odds:</label>
-          <input type="text" id="back_odds" name="back_odds" class="form-input" aria-label="Back Odds">
-        </div>
-        <div class="mb-6">
-          <label for="min_lay_odds" class="block text-gray-700 text-sm font-bold mb-2">Min Lay Odds:</label>
-          <div class="flex items-center">
-            <button type="button" onclick="adjustValue('min_lay_odds', -0.5)" class="btn btn-adjust" aria-label="Decrease Min Lay Odds">-</button>
-            <input type="text" id="min_lay_odds" name="min_lay_odds" class="form-input text-center" aria-label="Min Lay Odds">
-            <button type="button" onclick="adjustValue('min_lay_odds', 0.5)" class="btn btn-adjust" aria-label="Increase Min Lay Odds">+</button>
-          </div>
-        </div>
-        <div class="mb-6">
-          <label for="max_lay_odds" class="block text-gray-700 text-sm font-bold mb-2">Max Lay Odds:</label>
-          <div class="flex items-center">
-            <button type="button" onclick="adjustValue('max_lay_odds', -0.5)" class="btn btn-adjust" aria-label="Decrease Max Lay Odds">-</button>
-            <input type="text" id="max_lay_odds" name="max_lay_odds" class="form-input text-center" aria-label="Max Lay Odds">
-            <button type="button" onclick="adjustValue('max_lay_odds', 0.5)" class="btn btn-adjust" aria-label="Increase Max Lay Odds">+</button>
-          </div>
-        </div>
-        <div class="mb-6">
-          <label for="step" class="block text-gray-700 text-sm font-bold mb-2">Step:</label>
-          <div class="flex items-center">
-            <button type="button" onclick="adjustValue('step', -0.1)" class="btn btn-adjust" aria-label="Decrease Step">-</button>
-            <input type="text" id="step" name="step" value="0.5" class="form-input text-center" aria-label="Step">
-            <button type="button" onclick="adjustValue('step', 0.1)" class="btn btn-adjust" aria-label="Increase Step">+</button>
-          </div>
-        </div>
-        <div class="mb-6">
-          <label for="lay_commission" class="block text-gray-700 text-sm font-bold mb-2">Lay Commission (%):</label>
-          <input type="text" id="lay_commission" name="lay_commission" value="0" class="form-input" aria-label="Lay Commission">
-        </div>
-        <input type="submit" value="Calculate" class="btn btn-submit" aria-label="Calculate">
-      </form>
-    </div>
-  </div>  
+<!-- Non-Profitable Bets Section -->
+<div class="p-6 bg-white rounded-lg shadow-lg overflow-auto results-table">
+  <table class="w-full text-xs lg:text-base text-gray-700">
+    <thead class="bg-red-600 text-white">
+      <tr>
+        <th class="px-4 py-2">Lay Odds</th>
+        <th class="px-4 py-2">Lay Stake (£)</th>
+        <th class="px-4 py-2">Liability (£)</th>
+        <th class="px-4 py-2">Profit if Back Wins (£)</th>
+        <th class="px-4 py-2">Profit if Lay Wins (£)</th>
+        <th class="px-4 py-2">Match Rating (%)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% set non_profitable_results = results|selectattr('5', '<', 100)|list %}
+      {% if non_profitable_results %}
+        {% for result in non_profitable_results %}
+        <tr class="text-center hover:bg-red-50">
+          <td class="px-3 py-2 copyable relative cursor-pointer" data-value="{{ result[0] }}" onclick="copyToClipboard(this)">
+            {{ result[0] }}
+            <span class="tooltip absolute inset-0 flex items-center justify-center text-white bg-green-600 rounded opacity-0 transition-opacity duration-300 ease-in-out">Copied!</span>
+          </td>
+          <td class="px-3 py-2 copyable relative cursor-pointer" data-value="{{ "%.2f"|format(result[1]) }}" onclick="copyToClipboard(this)">
+            {{ "%.2f"|format(result[1]) }}
+            <span class="tooltip absolute inset-0 flex items-center justify-center text-white bg-red-600 rounded opacity-0 transition-opacity duration-300 ease-in-out">Copied!</span>
+          </td>
+          <td class="px-3 py-2">{{ "%.2f"|format(result[2]) }}</td>
+          <td class="px-3 py-2">{{ "%.2f"|format(result[3]) }}</td>
+          <td class="px-3 py-2">{{ "%.2f"|format(result[4]) }}</td>
+          <td class="px-3 py-2">{{ "%.2f"|format(result[5]) }}</td>
+        </tr>
+        {% endfor %}
+      {% else %}
+        <tr>
+          <td colspan="6">Well done! Looks like you're winning! 🥳</td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
 

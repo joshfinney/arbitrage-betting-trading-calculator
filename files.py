@@ -2,13 +2,15 @@ import os
 from collections import defaultdict
 import pyperclip
 
-def find_files_recursively(root_dir, target_files):
+def find_files_recursively(root_dir, target_files, ignored_dirs):
     """
     Traverse the directory tree rooted at root_dir, looking for files with names in target_files.
     Return a dictionary with file types as keys and list of paths as values.
     """
     found_files = defaultdict(list)
-    for dirpath, _, filenames in os.walk(root_dir):
+    for dirpath, dirnames, filenames in os.walk(root_dir):
+        # Skip ignored directories
+        dirnames[:] = [d for d in dirnames if d not in ignored_dirs]
         for filename in filenames:
             if filename in target_files:
                 file_extension = os.path.splitext(filename)[1]
@@ -28,14 +30,12 @@ def write_files_to_txt(file_dict, output_filename):
                     if os.path.isfile(file):
                         with open(file, 'r') as input_file:
                             content = input_file.read()
-                        
                         file_size = os.path.getsize(file)
                         file_details = (
                             f"File: {file}\n"
                             f"Size: {file_size} bytes\n"
                             f"{'=' * 40}\n\n"
                         )
-                        
                         output_file.write(file_details)
                         output_file.write(content)
                         output_file.write('\n\n')
@@ -43,53 +43,52 @@ def write_files_to_txt(file_dict, output_filename):
                         output_file.write(f"File: {file}\n")
                         output_file.write("Error: File not found.\n")
                         output_file.write(f"{'=' * 40}\n\n")
-        
         print(f"Contents written to {output_filename}")
-        
-        # Copy output file path to clipboard
         pyperclip.copy(os.path.abspath(output_filename))
         print(f"The output file path has been copied to the clipboard: {os.path.abspath(output_filename)}")
-        
     except Exception as e:
         print(f"An error occurred: {e}")
 
-def write_directory_tree(root_dir, output_filename):
+def write_directory_tree(root_dir, output_filename, ignored_dirs):
     """
     Write the directory tree structure to the output file.
     """
     try:
         with open(output_filename, 'w') as output_file:
             for dirpath, dirnames, filenames in os.walk(root_dir):
+                # Skip ignored directories
+                dirnames[:] = [d for d in dirnames if d not in ignored_dirs]
                 level = dirpath.replace(root_dir, '').count(os.sep)
-                indent = ' ' * 4 * (level)
+                indent = ' ' * 4 * level
                 output_file.write(f"{indent}{os.path.basename(dirpath)}/\n")
                 subindent = ' ' * 4 * (level + 1)
                 for filename in filenames:
                     output_file.write(f"{subindent}{filename}\n")
-        
         print(f"Directory tree written to {output_filename}")
-        
-        # Copy output file path to clipboard
         pyperclip.copy(os.path.abspath(output_filename))
         print(f"The output file path has been copied to the clipboard: {os.path.abspath(output_filename)}")
-        
     except Exception as e:
         print(f"An error occurred: {e}")
 
-# Example usage:
-if __name__ == "__main__":
-    # List of files to be written to the output file
-    target_files = ['index.html', 'styles.css', 'calculator.html', 'scripts.js', 'results.html']
-    # Directory to start the search
+def main():
+    print("Choose a feature to run:")
+    print("1. Find specific files and write to output file")
+    print("2. Write directory tree to output file")
+    choice = input("Enter the number of the feature you want to run: ")
+
+    target_files = ['results.html', 'styles.css', 'scripts.js']
     root_directory = '.'
-    # Name of the output file
-    output_file = 'combined_output.txt'
-    
-    # Find files recursively
-    files_to_write = find_files_recursively(root_directory, target_files)
-    
-    # Write found files to the output file
-    write_files_to_txt(files_to_write, output_file)
-    
-    # Write the directory tree to the output file
-    write_directory_tree(root_directory, 'directory_tree.txt')
+    ignored_dirs = ['.git', '__pycache__']
+
+    if choice == '1':
+        output_file = 'combined_output.txt'
+        files_to_write = find_files_recursively(root_directory, target_files, ignored_dirs)
+        write_files_to_txt(files_to_write, output_file)
+    elif choice == '2':
+        output_file = 'directory_tree.txt'
+        write_directory_tree(root_directory, output_file, ignored_dirs)
+    else:
+        print("Invalid choice. Please run the program again and select a valid option.")
+
+if __name__ == "__main__":
+    main()

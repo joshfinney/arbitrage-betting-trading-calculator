@@ -1,68 +1,84 @@
-<div class="w-full p-4 relative result-container">
-    <h1 class="text-center text-blue-600 text-2xl font-semibold mb-6">Results</h1>
-    <button id="fullscreen-btn" class="absolute top-4 right-4 p-2 bg-blue-500 text-white rounded">Toggle Fullscreen</button>
-    
-    <!-- Profitable Bets Section -->
-    <div class="p-6 bg-white rounded-lg shadow-lg overflow-auto results-table mb-6">
-      <h2 class="text-xl font-semibold text-green-600 mb-4">Profitable Bets (Match Rating ≥ 100%)</h2>
-      <table class="w-full text-xs lg:text-base text-gray-700">
-        <thead class="bg-green-600 text-white">
-          <tr>
-            <th class="px-4 py-2">Lay Odds</th>
-            <th class="px-4 py-2">Lay Stake (£)</th>
-            <th class="px-4 py-2">Liability (£)</th>
-            <th class="px-4 py-2">Profit if Back Wins (£)</th>
-            <th class="px-4 py-2">Profit if Lay Wins (£)</th>
-            <th class="px-4 py-2">Match Rating (%)</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for result in results if result[5] >= 100 %}
-          <tr class="text-center hover:bg-green-50">
-            <td class="px-3 py-2">{{ result[0] }}</td>
-            <td class="px-3 py-2 copyable relative cursor-pointer" onclick="copyToClipboard(this)">
-              {{ "%.2f"|format(result[1]) }}
-              <span class="tooltip absolute inset-0 flex items-center justify-center text-white bg-green-600 rounded opacity-0 transition-opacity duration-300 ease-in-out">Copied!</span>
-            </td>
-            <td class="px-3 py-2">{{ "%.2f"|format(result[2]) }}</td>
-            <td class="px-3 py-2">{{ "%.2f"|format(result[3]) }}</td>
-            <td class="px-3 py-2">{{ "%.2f"|format(result[4]) }}</td>
-            <td class="px-3 py-2">{{ "%.2f"|format(result[5]) }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  
-    <!-- Non-Profitable Bets Section -->
-    <div class="p-6 bg-white rounded-lg shadow-lg overflow-auto results-table">
-      <h2 class="text-xl font-semibold text-red-600 mb-4">Non-Profitable Bets (Match Rating < 100%)</h2>
-      <table class="w-full text-xs lg:text-base text-gray-700">
-        <thead class="bg-red-600 text-white">
-          <tr>
-            <th class="px-4 py-2">Lay Odds</th>
-            <th class="px-4 py-2">Lay Stake (£)</th>
-            <th class="px-4 py-2">Liability (£)</th>
-            <th class="px-4 py-2">Profit if Back Wins (£)</th>
-            <th class="px-4 py-2">Profit if Lay Wins (£)</th>
-            <th class="px-4 py-2">Match Rating (%)</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for result in results if result[5] < 100 %}
-          <tr class="text-center hover:bg-red-50">
-            <td class="px-3 py-2">{{ result[0] }}</td>
-            <td class="px-3 py-2 copyable relative cursor-pointer" onclick="copyToClipboard(this)">
-              {{ "%.2f"|format(result[1]) }}
-              <span class="tooltip absolute inset-0 flex items-center justify-center text-white bg-red-600 rounded opacity-0 transition-opacity duration-300 ease-in-out">Copied!</span>
-            </td>
-            <td class="px-3 py-2">{{ "%.2f"|format(result[2]) }}</td>
-            <td class="px-3 py-2">{{ "%.2f"|format(result[3]) }}</td>
-            <td class="px-3 py-2">{{ "%.2f"|format(result[4]) }}</td>
-            <td class="px-3 py-2">{{ "%.2f"|format(result[5]) }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>  
+<h1 class="text-center text-blue-600 text-2xl font-semibold mb-6">Results</h1>
+<button id="fullscreen-btn" class="absolute top-4 right-4 p-2 bg-blue-500 text-white rounded">Toggle Fullscreen</button>
+
+<!-- Profitable Bets Section -->
+<div class="p-6 bg-slate-100 rounded-lg shadow-lg overflow-auto results-table mb-6">
+  <table class="w-full text-xs lg:text-base text-gray-700">
+    <thead class="bg-green-600 text-white">
+      <tr>
+        <th class="px-4 py-2">Lay Odds</th>
+        <th class="px-4 py-2">Lay Stake (£)</th>
+        <th class="px-4 py-2">Liability (£)</th>
+        <th class="px-4 py-2">Profit if Back Wins (£)</th>
+        <th class="px-4 py-2">Profit if Lay Wins (£)</th>
+        <th class="px-4 py-2">Match Rating (%)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% set profitable_results = results|selectattr('5', '>=', 100)|list %}
+      {% if profitable_results %}
+        {% for result in profitable_results %}
+        <tr class="text-center hover:bg-green-50">
+          <td class="px-3 py-2 copyable relative cursor-pointer" data-value="{{ result[0] }}" onclick="copyToClipboard(this)">
+            {{ result[0] }}
+            <span class="tooltip absolute inset-0 flex items-center justify-center text-white bg-green-600 rounded opacity-0 transition-opacity duration-300 ease-in-out">Copied!</span>
+          </td>
+          <td class="px-3 py-2 copyable relative cursor-pointer" data-value="{{ "%.2f"|format(result[1]) }}" onclick="copyToClipboard(this)">
+            {{ "%.2f"|format(result[1]) }}
+            <span class="tooltip absolute inset-0 flex items-center justify-center text-white bg-green-600 rounded opacity-0 transition-opacity duration-300 ease-in-out">Copied!</span>
+          </td>
+          <td class="px-3 py-2">{{ "%.2f"|format(result[2]) }}</td>
+          <td class="px-3 py-2">{{ "%.2f"|format(result[3]) }}</td>
+          <td class="px-3 py-2">{{ "%.2f"|format(result[4]) }}</td>
+          <td class="px-3 py-2">{{ "%.2f"|format(result[5]) }}</td>
+        </tr>
+        {% endfor %}
+      {% else %}
+        <tr>
+          <td colspan="6">Looks like an L 😢</td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Non-Profitable Bets Section -->
+<div class="p-6 bg-white rounded-lg shadow-lg overflow-auto results-table">
+  <table class="w-full text-xs lg:text-base text-gray-700">
+    <thead class="bg-red-600 text-white">
+      <tr>
+        <th class="px-4 py-2">Lay Odds</th>
+        <th class="px-4 py-2">Lay Stake (£)</th>
+        <th class="px-4 py-2">Liability (£)</th>
+        <th class="px-4 py-2">Profit if Back Wins (£)</th>
+        <th class="px-4 py-2">Profit if Lay Wins (£)</th>
+        <th class="px-4 py-2">Match Rating (%)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% set non_profitable_results = results|selectattr('5', '<', 100)|list %}
+      {% if non_profitable_results %}
+        {% for result in non_profitable_results %}
+        <tr class="text-center hover:bg-red-50">
+          <td class="px-3 py-2 copyable relative cursor-pointer" data-value="{{ result[0] }}" onclick="copyToClipboard(this)">
+            {{ result[0] }}
+            <span class="tooltip absolute inset-0 flex items-center justify-center text-white bg-green-600 rounded opacity-0 transition-opacity duration-300 ease-in-out">Copied!</span>
+          </td>
+          <td class="px-3 py-2 copyable relative cursor-pointer" data-value="{{ "%.2f"|format(result[1]) }}" onclick="copyToClipboard(this)">
+            {{ "%.2f"|format(result[1]) }}
+            <span class="tooltip absolute inset-0 flex items-center justify-center text-white bg-red-600 rounded opacity-0 transition-opacity duration-300 ease-in-out">Copied!</span>
+          </td>
+          <td class="px-3 py-2">{{ "%.2f"|format(result[2]) }}</td>
+          <td class="px-3 py-2">{{ "%.2f"|format(result[3]) }}</td>
+          <td class="px-3 py-2">{{ "%.2f"|format(result[4]) }}</td>
+          <td class="px-3 py-2">{{ "%.2f"|format(result[5]) }}</td>
+        </tr>
+        {% endfor %}
+      {% else %}
+        <tr>
+          <td colspan="6">Well done! Looks like you're winning! 🥳</td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
